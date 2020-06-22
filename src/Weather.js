@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import { render } from '@testing-library/react';
 
 class WeatherComponent extends Component {
     constructor(props) {
@@ -69,11 +68,11 @@ class WeatherComponent extends Component {
 
     render() {
         const {clouds, sunrise, sunset, temp, feels_like, visibility, dt, humidity, wind_deg, wind_speed, weather} = this.props.weather.current || {};
-        const {country, city} = this.props.country;
+        const {country, city} = this.props.location;
         const {units} = this.props;
         const {currentTime} = this.state;
 
-        if(this.props.weather && this.props.country) {
+        if(this.props.weather && this.props.location) {
             return (
                 <div id="weather">
                     <h3>{city}, {country}</h3>
@@ -82,8 +81,9 @@ class WeatherComponent extends Component {
                         <li>Temperature: {this.formatTemp(temp, units)}</li>
                         <li>Feels Like:{this.formatTemp(feels_like, units)}</li>
                         <li>Wind Direction: {wind_deg}&deg;</li>
-                        <li>Wind Speed: {wind_speed}</li>
-                        <li>Humidity: {humidity}</li>
+                        <li>Wind Speed: {wind_speed}m/s</li>
+                        <li>Humidity: {humidity}&#37;</li>
+                        <li>Clouds: {clouds}&#37;</li>
                         <li>Visibility: {this.convertToKilometers(visibility)}km / {this.convertToMiles(visibility)}mi</li>
                         <li>Current Time: {this.getTime(currentTime)}</li>
                         <li>Sunrise: {this.getTime(this.formatDate(sunrise))}</li>

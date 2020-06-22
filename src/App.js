@@ -13,21 +13,23 @@ class App extends Component {
             places: '',
             nearest: '',
             weather: '',
-            country: '',
+            location: '',
             units: 'metric'
         };
     };
 
     componentDidMount = () => {
-        navigator.geolocation.getCurrentPosition(this.success, this.error)
+        this.fetchGeoData();
     };
 
-    success = (pos) => {
+    success = async (pos) => {
         const {coords} = pos;
         const {latitude, longitude} = coords;
+        const location = await this.reverseGeoCode({lat: latitude, long: longitude});
         this.setState({
             lat: latitude,
-            long: longitude
+            long: longitude,
+            location
         }, this.setStateCallback);
     };
 
@@ -63,28 +65,45 @@ class App extends Component {
         });
     };
 
+    fetchGeoDataNavigator = () => {
+        navigator.geolocation.getCurrentPosition(this.success, this.error);
+    };
+
     fetchGeoData = () => {
         let url = `https://infinite-dusk-92659.herokuapp.com/iplookup`;
 
         fetch(url)
         .then(res => res.json())
         .then(data => {
+            console.log(data);
             let lat, long;
             [lat, long] = [data.ll[0], data.ll[1]];
             // we're waiting for the state to change and then we fetch the weather data, otherwise lat and long are not guaranteed to have a value.
             this.setState({
                 lat, 
-                long
+                long,
+                location: data
             }, this.setStateCallback);
         });
     };
 
     setStateCallback = () => {
-        this.reverseGeoCode();
         this.fetchWeatherData();
     };
     
-    fetchPlacesData = (query) => {
+    fetchPlacesData = (query, location) => {
+        const {country, road, city} = this.state.location;
+        const locationQuery = `${road ? road + ', ' : ''}${city}, ${country}`;
+
+        // don't make the call if the location is already the same, this is so that i don't waste my limited API requests
+        if(location && location !== locationQuery) {
+            this.forwardGeoCode(location, () => this.fetchPlacesRequest(query));
+        } else {
+            this.fetchPlacesRequest(query);
+        };
+    };
+
+    fetchPlacesRequest = (query) => {
         const {limit, lat, long} = this.state;
         let ll = `${lat},${long}`;
         let url = `https://infinite-dusk-92659.herokuapp.com/foursquare/?&ll=${ll}&query=${query}&v=20180323&limit=${limit}`;
@@ -103,30 +122,62 @@ class App extends Component {
         });
     };
 
-    reverseGeoCode() {
-        const {lat, long} = this.state;
+    reverseGeoCode(coords) {
+        const {lat, long} = coords;
         const url = `https://infinite-dusk-92659.herokuapp.com/opencagedata/?q=${lat},${long}+`;
+
+        return fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            const location = data.results[0].components;
+            return location;
+        });
+    };
+
+    forwardGeoCode(query, cb) {
+        const formattedQuery = query.trim().replace(/\s/g, '+');
+        const url = `https://infinite-dusk-92659.herokuapp.com/opencagedata/q=${formattedQuery}`;
 
         fetch(url)
         .then(res => res.json())
         .then(data => {
-            const country = data.results[0].components;
+            const result = data.results[0];
+            // what happens if there is no result
+            if(!result) {
+                return;
+            };
+            const {components, geometry} = result;
+            const lat = geometry.lat;
+            const long = geometry.lng;
 
-            this.setState({
-                country
-            });
+            if(cb) {
+                this.setState({
+                    lat,
+                    long,
+                    location: components
+                }, cb);
+            } else {
+                this.setState({
+                    lat,
+                    long,
+                    location: components
+                });
+            };
         });
     };
 
     render() {
-        const {lat, long, places, nearest, weather, country, units} = this.state;
-        return (
+        const {lat, long, places, nearest, weather, location, units} = this.state;
+        const content = lat && long ? (
             <div>
-                <SearchForm fetchPlacesData={this.fetchPlacesData}/>
+                <SearchForm fetchPlacesData={this.fetchPlacesData} fetchGeoDataNavigator={this.fetchGeoDataNavigator} location={location}/>
                 <MapComponent lat={lat} long={long} zoom="12" places={places} nearest={nearest}/>
-                <WeatherComponent weather={weather} country={country} units={units}/>
+                <WeatherComponent weather={weather} location={location} units={units}/>
             </div>
+        ) : (
+            <h1>Loading...</h1>
         );
+        return content;
     };
 };
 
