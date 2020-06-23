@@ -119,7 +119,7 @@ class App extends Component {
         .then(res => res.json())
         .then(async data => {
             // places is just an array of all points of interest, just had to format the data a bit.
-            const places = data.response.groups[0].items;
+            const places = data ? data.response.groups[0].items : [];
             if(places.length > 0) {
                 // nearest is used when setting the Map markers, the orange one will be the one that is closest to the visitor.
                 const nearest = this.getNearest(places);
