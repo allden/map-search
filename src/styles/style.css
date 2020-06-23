@@ -80,6 +80,7 @@ body {
 }
 
 .vh-100 {
+    height: 100vh;
     min-height: 100vh;
 }
 
@@ -272,9 +273,5 @@ hr {
 @media screen and (max-width: 768px) {
     #weather-data {
         grid-template-columns: repeat(2, 1fr);
-    }
-
-    .hide-mobile {
-        display: none;
     }
 };
