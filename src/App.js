@@ -182,7 +182,7 @@ class App extends Component {
     render() {
         const {lat, long, places, nearest, weather, location, units, queryError} = this.state;
         const content = lat && long ? (
-            <div className="vh-100 d-flex flex-column">
+            <div id="main-container" className="vh-100 d-flex flex-column">
                 <Nav />
                 <SearchForm fetchPlacesData={this.fetchPlacesData}/>
                 <MapComponent lat={lat} long={long} zoom="12" places={places} nearest={nearest} queryError={queryError}/>

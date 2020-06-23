@@ -276,7 +276,7 @@ hr {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .vh-100 {
+    #main-container.vh-100 {
         height: auto;
         min-height: auto;
     }
