@@ -6,7 +6,7 @@
 }
 
 .leaflet-container {
-    height: 500px;
+    height: 50vh !important;
 }
 
 body {
@@ -234,6 +234,7 @@ form input {
 }
 
 form input:focus {
+    outline: none;
     border-bottom: 1px solid var(--primary);
 }
 
@@ -273,5 +274,10 @@ hr {
 @media screen and (max-width: 768px) {
     #weather-data {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .vh-100 {
+        height: auto;
+        min-height: auto;
     }
 };
