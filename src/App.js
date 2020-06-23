@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import MapComponent from './Map';
 import SearchForm from './SearchForm';
 import WeatherComponent from './Weather';
+import Nav from './Nav';
 
 class App extends Component {
     constructor() {
@@ -10,16 +11,20 @@ class App extends Component {
             limit: 10,
             lat: '',
             long: '',
-            places: '',
+            places: [],
             nearest: '',
             weather: '',
             location: '',
-            units: 'metric'
+            units: 'metric',
+            queryError: ''
         };
     };
 
-    componentDidMount = () => {
-        this.fetchGeoData();
+    componentDidMount = async() => {
+        await this.fetchGeoData()
+        .then(() => {
+            this.fetchGeoDataNavigator();
+        });
     };
 
     success = async (pos) => {
@@ -56,10 +61,10 @@ class App extends Component {
         const {lat, long, units} = this.state;
         let url = `https://infinite-dusk-92659.herokuapp.com/openweathermap/?lat=${lat}&lon=${long}&exclude=hourly,daily,minutely&units=${units}`;
 
-        fetch(url)
+        return fetch(url)
         .then(res => res.json())
         .then(weather => {
-            this.setState({
+            return this.setState({
                 weather
             });
         });
@@ -72,23 +77,25 @@ class App extends Component {
     fetchGeoData = () => {
         let url = `https://infinite-dusk-92659.herokuapp.com/iplookup`;
 
-        fetch(url)
+        return fetch(url)
         .then(res => res.json())
         .then(data => {
             console.log(data);
             let lat, long;
             [lat, long] = [data.ll[0], data.ll[1]];
             // we're waiting for the state to change and then we fetch the weather data, otherwise lat and long are not guaranteed to have a value.
-            this.setState({
+            return this.setState({
                 lat, 
                 long,
                 location: data
-            }, this.setStateCallback);
+            }, () => {
+                return this.setStateCallback();
+            });
         });
     };
 
     setStateCallback = () => {
-        this.fetchWeatherData();
+        return this.fetchWeatherData();
     };
     
     fetchPlacesData = (query, location) => {
@@ -113,12 +120,19 @@ class App extends Component {
         .then(async data => {
             // places is just an array of all points of interest, just had to format the data a bit.
             const places = data.response.groups[0].items;
-            // nearest is used when setting the Map markers, the orange one will be the one that is closest to the visitor.
-            const nearest = this.getNearest(places);
-            this.setState({
-                places,
-                nearest
-            });
+            if(places.length > 0) {
+                // nearest is used when setting the Map markers, the orange one will be the one that is closest to the visitor.
+                const nearest = this.getNearest(places);
+                this.setState({
+                    queryError: '',
+                    places,
+                    nearest
+                });
+            } else {
+                this.setState({
+                    queryError: 'There were no results for your search.'
+                });
+            };
         });
     };
 
@@ -136,7 +150,7 @@ class App extends Component {
 
     forwardGeoCode(query, cb) {
         const formattedQuery = query.trim().replace(/\s/g, '+');
-        const url = `https://infinite-dusk-92659.herokuapp.com/opencagedata/q=${formattedQuery}`;
+        const url = `https://infinite-dusk-92659.herokuapp.com/opencagedata/?q=${formattedQuery}`;
 
         fetch(url)
         .then(res => res.json())
@@ -167,15 +181,24 @@ class App extends Component {
     };
 
     render() {
-        const {lat, long, places, nearest, weather, location, units} = this.state;
+        const {lat, long, places, nearest, weather, location, units, queryError} = this.state;
         const content = lat && long ? (
-            <div>
-                <SearchForm fetchPlacesData={this.fetchPlacesData} fetchGeoDataNavigator={this.fetchGeoDataNavigator} location={location}/>
-                <MapComponent lat={lat} long={long} zoom="12" places={places} nearest={nearest}/>
+            <div className="vh-100 d-flex flex-column">
+                <Nav />
+                <SearchForm fetchPlacesData={this.fetchPlacesData}/>
+                <MapComponent lat={lat} long={long} zoom="12" places={places} nearest={nearest} queryError={queryError}/>
                 <WeatherComponent weather={weather} location={location} units={units}/>
             </div>
         ) : (
-            <h1>Loading...</h1>
+            <div className="d-flex vh-100 flex-column">
+                <Nav />
+                <div className="loading-screen d-grid flex-grow-1">
+                    <div className="content align-self justify-self">
+                        <div className="loader"></div>
+                        <h3 className="text-center display-1">Loading...</h3>
+                    </div>
+                </div>
+            </div>
         );
         return content;
     };

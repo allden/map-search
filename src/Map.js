@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, TileLayer, Circle, Marker, Popup } from 'react-leaflet';
+import { Map, TileLayer, Circle, Marker, Popup, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import marker from './images/marker.png';
@@ -63,9 +63,16 @@ function createMetricsObj(meters) {
 };
 
 function MapComponent(props) {
-    const {lat, long, zoom, places, nearest} = props;
+    const {lat, long, zoom, places, nearest, queryError} = props;
+    const errorMessage = queryError ?
+    (
+        <div className="message absolute top-center index-top">
+            {queryError}
+        </div>
+    ) : null;
+
     const position = [lat, long];
-    const markers = places ? places.map(place => {
+    const markers = places.length > 0 ? places.map(place => {
         const {name, location} = place.venue;
         const placePosition = formatCoordinates(place);
         const placeAddress = formatAddress(place);
@@ -82,16 +89,19 @@ function MapComponent(props) {
                 </div>
             </Popup>
         </Marker>
-    }) : null;
+    }) : (
+        null
+    );
 
     return (
-        <Map center={position} zoom={zoom}>
+        <Map center={position} zoom={zoom} style={{flexGrow: 1}}>
             <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
             />
             <Circle center={position} radius={100}/>
             {markers}
+            {errorMessage}
         </Map>
     );
 };

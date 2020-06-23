@@ -51,6 +51,10 @@ class WeatherComponent extends Component {
         return result;
     };
 
+    capitalizeText(text) {
+        return text.toUpperCase();
+    };
+
     // this will reflect the passing of time on the current time in the UI
     refreshTime = () => {
         this.setState({
@@ -67,28 +71,34 @@ class WeatherComponent extends Component {
     };
 
     render() {
-        const {clouds, sunrise, sunset, temp, feels_like, visibility, dt, humidity, wind_deg, wind_speed, weather} = this.props.weather.current || {};
-        const {country, city} = this.props.location;
+        const {sunrise, sunset, temp, feels_like, visibility, humidity, wind_deg, wind_speed, weather} = this.props.weather.current || {};
+        const {country, road, city, town} = this.props.location;
         const {units} = this.props;
         const {currentTime} = this.state;
 
         if(this.props.weather && this.props.location) {
             return (
-                <div id="weather">
-                    <h3>{city}, {country}</h3>
-                    <ul>
-                        <li>Weather: {weather ? weather[0].description : undefined}</li>
-                        <li>Temperature: {this.formatTemp(temp, units)}</li>
-                        <li>Feels Like:{this.formatTemp(feels_like, units)}</li>
-                        <li>Wind Direction: {wind_deg}&deg;</li>
-                        <li>Wind Speed: {wind_speed}m/s</li>
-                        <li>Humidity: {humidity}&#37;</li>
-                        <li>Clouds: {clouds}&#37;</li>
-                        <li>Visibility: {this.convertToKilometers(visibility)}km / {this.convertToMiles(visibility)}mi</li>
-                        <li>Current Time: {this.getTime(currentTime)}</li>
-                        <li>Sunrise: {this.getTime(this.formatDate(sunrise))}</li>
-                        <li>Sunset: {this.getTime(this.formatDate(sunset))}</li>
-                    </ul>
+                <div id="weather-container">
+                    <div id="weather" className="text-center gradient text-light p-bal">
+                        <h3 className="m-0 display-2">
+                            {road ? road + ', ' : ''}
+                            {city || town ? city + ', ' || town + ', ' : ''}
+                            {country}
+                        </h3>
+                        <h4 className="m-0">{weather ? this.capitalizeText(weather[0].description) : this.capitalizeText('no data available')}</h4>
+                        <p className="display-3 m-0">{this.getTime(currentTime)}</p>
+                        <hr className="border-bottom border-light w-90"></hr>
+                        <ul className="list-unstyled d-grid" id="weather-data">
+                            <li><b>Temperature</b>: {this.formatTemp(temp, units)}</li>
+                            <li><b>Feels Like</b>:{this.formatTemp(feels_like, units)}</li>
+                            <li><b>Wind Direction</b>: {wind_deg}&deg;</li>
+                            <li><b>Wind Speed</b>: {wind_speed}m/s</li>
+                            <li><b>Humidity</b>: {humidity}&#37;</li>
+                            <li><b>Visibility</b>: {this.convertToKilometers(visibility)}km</li>
+                            <li><b>Sunrise</b>: {this.getTime(this.formatDate(sunrise))}</li>
+                            <li><b>Sunset</b>: {this.getTime(this.formatDate(sunset))}</li>
+                        </ul>
+                    </div>
                 </div>
             );
         } else {

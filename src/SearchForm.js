@@ -27,19 +27,13 @@ class SearchForm extends Component {
 
     render() {
         const {location, search} = this.state;
-        const locationProp = this.props.location;
-        const {fetchGeoDataNavigator} = this.props;
-        const {country, road, city} = locationProp;
-        const query = `${road ? road + ', ' : ''}${city}, ${country}`;
+
         return (
-            <div onSubmit={this.onSubmitHandler} className="form-container">
-                <button onClick={fetchGeoDataNavigator}>Get Current Location</button>
-                <form id="search-form">
-                    <label>Where do you want to look?</label>
-                    <input onChange={this.onChangeHandler} value={location || query} type="text" id="location" placeholder="Leave blank for current location."></input>
-                    <label>What do you want to find?</label>
-                    <input onChange={this.onChangeHandler} value={search} type="text" id="search" placeholder="ex. Cafe"></input>
-                    <button className="btn">Search</button>
+            <div onSubmit={this.onSubmitHandler} className="form-container d-grid py-1">
+                <form id="search-form" className="d-flex flex-column justify-self w-75 p-1">
+                    <input onChange={this.onChangeHandler} value={location} type="text" id="location" placeholder="e.g. st Fake Street, Manchester, UK (Optional)"></input>
+                    <input onChange={this.onChangeHandler} value={search} type="text" id="search" placeholder="Point of Interest: e.g. Cafe"></input>
+                    <button className="btn btn-primary">Search</button>
                 </form>
             </div>
         );
