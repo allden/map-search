@@ -79,8 +79,7 @@ class App extends Component {
 
         return fetch(url)
         .then(res => res.json())
-        .then(data => {
-            console.log(data);
+        .then(data => {            
             let lat, long;
             [lat, long] = [data.ll[0], data.ll[1]];
             // we're waiting for the state to change and then we fetch the weather data, otherwise lat and long are not guaranteed to have a value.
@@ -193,7 +192,7 @@ class App extends Component {
             <div className="d-flex vh-100 flex-column">
                 <Nav />
                 <div className="loading-screen d-grid flex-grow-1">
-                    <div className="content align-self justify-self">
+                    <div className="content align-self justify-self d-flex align-center justify-center flex-column">
                         <div className="loader"></div>
                         <h3 className="text-center display-1">Loading...</h3>
                     </div>

@@ -161,6 +161,10 @@ body {
     justify-content: center;
 }
 
+.align-center {
+    align-items: center;
+}
+
 .container {
     width: 75vw;
 }
@@ -242,6 +246,7 @@ hr {
     border-radius: 50%;
     height: 10vw;
     width: 10vw;
+    text-align: center;
     -webkit-animation: spin 2s linear infinite;
     animation: spin 2s linear infinite;
 }

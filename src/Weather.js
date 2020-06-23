@@ -5,7 +5,7 @@ class WeatherComponent extends Component {
         super(props);
         this.interval = '';
         this.state = {
-            currentTime: new Date(new Date().toLocaleString())
+            currentTime: new Date(new Date().toLocaleString().replace(/\,]/g, ''))
         };
     };
 
@@ -57,8 +57,9 @@ class WeatherComponent extends Component {
 
     // this will reflect the passing of time on the current time in the UI
     refreshTime = () => {
+        const localTime = new Date().toLocaleString().replace(/[\,]/g, '');        
         this.setState({
-            currentTime: new Date(new Date().toLocaleString())
+            currentTime: new Date(localTime)
         });
     };
 
