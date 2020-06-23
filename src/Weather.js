@@ -87,7 +87,7 @@ class WeatherComponent extends Component {
                             {country}
                         </h3>
                         <h4 className="m-0">{weather ? this.capitalizeText(weather[0].description) : this.capitalizeText('no data available')}</h4>
-                        <p className="display-3 m-0">{this.getTime(currentTime)}</p>
+                        <p className="display-3 m-0 hide-mobile">{this.getTime(currentTime)}</p>
                         <hr className="border-bottom border-light w-90"></hr>
                         <ul className="list-unstyled d-grid" id="weather-data">
                             <li><b>Temperature</b>: {this.formatTemp(temp, units)}</li>
