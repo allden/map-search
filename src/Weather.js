@@ -91,7 +91,7 @@ class WeatherComponent extends Component {
                         <hr className="border-bottom border-light w-90"></hr>
                         <ul className="list-unstyled d-grid" id="weather-data">
                             <li><b>Temperature</b>: {this.formatTemp(temp, units)}</li>
-                            <li><b>Feels Like</b>:{this.formatTemp(feels_like, units)}</li>
+                            <li><b>Feels Like</b>: {this.formatTemp(feels_like, units)}</li>
                             <li><b>Wind Direction</b>: {wind_deg}&deg;</li>
                             <li><b>Wind Speed</b>: {wind_speed}m/s</li>
                             <li><b>Humidity</b>: {humidity}&#37;</li>
